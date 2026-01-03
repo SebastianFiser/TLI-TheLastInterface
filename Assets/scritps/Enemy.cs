@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Enemy : Entity
 {
+    private bool playerDetected;
+
     protected override void Update()
     {
         handleCollision();//Handlo collision
@@ -11,6 +13,15 @@ public class Enemy : Entity
         handleAnimations();
         //Handle Flip
         handleFlip();
+        //Handle HandleAttack
+        HandleAttack();
+    }
+
+    protected override void HandleAttack()
+    {
+        //if player detected anim to set trigger attack
+        if(playerDetected)
+            anim.SetTrigger("attack");
     }
 
     protected override void handleMovement()
@@ -22,5 +33,11 @@ public class Enemy : Entity
         }
         else
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+    }
+
+    protected override void handleCollision()
+    {
+        base.handleCollision();
+        playerDetected = Physics2D.OverlapCircle(attackPoint.position, attackRadius, whatIsTarget);
     }
 }

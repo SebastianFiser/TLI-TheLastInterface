@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerAnimaionEvents : MonoBehaviour
+public class Entity_AnimaionEvents : MonoBehaviour
 {
     private Entity entity;
 
