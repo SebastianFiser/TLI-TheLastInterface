@@ -4,11 +4,17 @@ public class Entity : MonoBehaviour
 {
     protected Animator anim;
     protected Rigidbody2D rb;
+    protected Collider2D col;
+    protected Entity_VFX entityVfx;
 
     [Header("Attack Details")]
     [SerializeField] protected float attackRadius;
     [SerializeField] protected Transform attackPoint;
     [SerializeField] protected LayerMask whatIsTarget;
+
+    [Header("Health")]
+    [SerializeField]private int maxHealth = 1;
+    [SerializeField]private int currentHealth;
 
 
     [Header("Movement details")]
@@ -27,8 +33,11 @@ public class Entity : MonoBehaviour
 
     private void Awake()
     {
+        entityVfx = GetComponent<Entity_VFX>();
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponentInChildren<Animator>();
+        col = GetComponent<Collider2D>();
+        currentHealth = maxHealth;
     }
 
     protected virtual void Update()
@@ -57,6 +66,21 @@ public class Entity : MonoBehaviour
 
     private void takeDamage()
     {
+        currentHealth -= 1;
+        entityVfx.PlayOnDamageVFX();
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    protected virtual void Die()
+    {
+        anim.enabled = false;
+        col.enabled = false;
+        rb.gravityScale = 12;
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, 15);
 
     }
 
