@@ -7,6 +7,7 @@ public class worldGenSkrpt : MonoBehaviour
     public Tilemap mojemapa;
     public TileBase hlinaTrava;
     public TileBase hlinaHlina;
+    public int KrustaVelikost;
     [Header("CordSpecs")]
     public int xRange = 20;
     public int yRange = -15;
@@ -25,6 +26,8 @@ public class worldGenSkrpt : MonoBehaviour
         vyhladMapu();
         vyhladMapu();
         vyhladMapu();
+
+        vytvorKrustu();
 
         vykresliMapu();
     }
@@ -86,6 +89,13 @@ public class worldGenSkrpt : MonoBehaviour
                     wallcount++;
             }
         return wallcount;
+    }
+
+    private void VytvorKrustu()
+    {
+        for (int x = 0; x < sirka; x++)
+            for (int y = vyska - KrustaVelikost; y < vyska; y++)
+                mapa[x, y] = 1;
     }
 
     private void vykresliMapu()
