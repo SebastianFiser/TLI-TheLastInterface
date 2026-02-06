@@ -18,14 +18,14 @@ public class worldGenSkrpt : MonoBehaviour
     private int vyska;
     [Range(0, 100)] public int fillPercent = 45;
     public int neededNeighbors = 4;
+    public int vyhladKratMapu = 3;
 
     void Start()
     {
         GenerujMapu();
 
-        vyhladMapu();
-        vyhladMapu();
-        vyhladMapu();
+        for (int i = 0; i <= vyhladKratMapu; i++)
+            vyhladMapu();
 
         vytvorKrustu();
 
@@ -91,7 +91,7 @@ public class worldGenSkrpt : MonoBehaviour
         return wallcount;
     }
 
-    private void VytvorKrustu()
+    private void vytvorKrustu()
     {
         for (int x = 0; x < sirka; x++)
             for (int y = vyska - KrustaVelikost; y < vyska; y++)

@@ -249,7 +249,7 @@ Transform:
   m_GameObject: {fileID: 68671622}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.57, y: 2.05, z: 0}
+  m_LocalPosition: {x: -7.57, y: -60, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1396,11 +1396,13 @@ MonoBehaviour:
   mojemapa: {fileID: 225772833}
   hlinaTrava: {fileID: 11400000, guid: 1f28efd2cc0bbc6fa9022adbc2ff4fd3, type: 2}
   hlinaHlina: {fileID: 11400000, guid: 32215ca698b0650da900666730fdcfb7, type: 2}
+  KrustaVelikost: 5
   xRange: 500
-  yRange: -50
+  yRange: -200
   grassLevel: -5
-  fillPercent: 55
-  neededNeighbors: 4
+  fillPercent: 70
+  neededNeighbors: 5
+  vyhladKratMapu: 3
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
