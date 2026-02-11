@@ -10,7 +10,8 @@ public class worldGenSkrpt : MonoBehaviour
     public int KrustaVelikost;
     [Header("CordSpecs")]
     public int xRange = 20;
-    public int yRange = -15;
+    public int CelkovaVyska = 500;
+    public int hloubkaPodzemi = 300;
     public int grassLevel = -5;
     [Header("tileSpecs")]
     private int[,] mapa;
@@ -35,7 +36,7 @@ public class worldGenSkrpt : MonoBehaviour
     private void GenerujMapu()
     {
         sirka = xRange * 2;
-        vyska = Mathf.Abs(yRange - grassLevel);
+        vyska = CelkovaVyska;
         mapa = new int[sirka, vyska];
         NaplnMapuNahodne();
     }
@@ -45,14 +46,21 @@ public class worldGenSkrpt : MonoBehaviour
         for (int x = 0; x < sirka; x++)
             for (int y = 0; y < vyska; y++)
             {
-                int selectedNum = Random.Range(0, 100);
-                if (selectedNum < fillPercent)
+                if (y < hloubkaPodzemi)
                 {
-                    mapa[x, y] = 1; // Tady doplň 1
+                    int selectedNum = Random.Range(0, 100);
+                    if (selectedNum < fillPercent)
+                    {
+                        mapa[x, y] = 1; // Tady doplň 1
+                    }
+                    else
+                    {
+                        mapa[x, y] = 0; // Tady doplň 0
+                    }
                 }
                 else
                 {
-                    mapa[x, y] = 0; // Tady doplň 0
+                    mapa[x, y] = 0;
                 }
             }
     }
@@ -104,7 +112,7 @@ public class worldGenSkrpt : MonoBehaviour
         {
             for (int y = 0; y < vyska; y++)
             {
-                Vector3Int pozice = new Vector3Int(x - xRange, y + yRange, 0);
+                Vector3Int pozice = new Vector3Int(x - xRange, y + hloubkaPodzemi, 0);
 
                 if (mapa[x, y] == 1)
                     mojemapa.SetTile(pozice, hlinaHlina);
