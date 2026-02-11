@@ -1,126 +1,153 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class worldGenSkrpt : MonoBehaviour
+/// <summary>
+/// Handles procedural generation of the world map using cellular automata.
+/// </summary>
+public class WorldGenerator : MonoBehaviour
 {
-    [Header("Block Specs")]
-    public Tilemap mojemapa;
-    public TileBase hlinaTrava;
-    public TileBase hlinaHlina;
-    public int KrustaVelikost;
-    [Header("CordSpecs")]
-    public int xRange = 20;
-    public int CelkovaVyska = 500;
-    public int hloubkaPodzemi = 300;
-    public int grassLevel = -5;
-    [Header("tileSpecs")]
-    private int[,] mapa;
-    private int sirka;
-    private int vyska;
-    [Range(0, 100)] public int fillPercent = 45;
-    public int neededNeighbors = 4;
-    public int vyhladKratMapu = 3;
+    [Header("Tile Settings")]
+    [SerializeField] private Tilemap targetTilemap;
+    [SerializeField] private TileBase grassTile;
+    [SerializeField] private TileBase dirtTile;
 
-    void Start()
+    [Header("Generation Settings")]
+    [Tooltip("Total width of the map (centered around 0).")]
+    [SerializeField] private int xRange = 20;
+    [SerializeField] private int totalHeight = 500;
+    [SerializeField] private int undergroundDepth = 300;
+    [SerializeField] private int crustSize = 5;
+
+    [Header("Cellular Automata Settings")]
+    [Range(0, 100)] [SerializeField] private int fillPercent = 45;
+    [SerializeField] private int smoothIterations = 3;
+    [SerializeField] private int neighborThreshold = 4;
+
+    private int[,] mapGrid;
+    private int width;
+    private int height;
+
+    private void Start()
     {
-        GenerujMapu();
-
-        for (int i = 0; i <= vyhladKratMapu; i++)
-            vyhladMapu();
-
-        vytvorKrustu();
-
-        vykresliMapu();
+        GenerateWorld();
     }
 
-    private void GenerujMapu()
+    public void GenerateWorld()
     {
-        sirka = xRange * 2;
-        vyska = CelkovaVyska;
-        mapa = new int[sirka, vyska];
-        NaplnMapuNahodne();
-    }
+        width = xRange * 2;
+        height = totalHeight;
+        mapGrid = new int[width, height];
 
-    private void NaplnMapuNahodne()
-    {
-        for (int x = 0; x < sirka; x++)
-            for (int y = 0; y < vyska; y++)
-            {
-                if (y < hloubkaPodzemi)
-                {
-                    int selectedNum = Random.Range(0, 100);
-                    if (selectedNum < fillPercent)
-                    {
-                        mapa[x, y] = 1; // Tady doplň 1
-                    }
-                    else
-                    {
-                        mapa[x, y] = 0; // Tady doplň 0
-                    }
-                }
-                else
-                {
-                    mapa[x, y] = 0;
-                }
-            }
-    }
+        InitializeMapRandomly();
 
-    private void vyhladMapu()
-    {
-        int[,] novaMapa = new int[sirka, vyska];
-        for (int x = 0; x < sirka; x++)
-            for (int y = 0; y < vyska; y++)
-            {
-                int s = GetSurroundingWallCount(x, y);
-                if (s > neededNeighbors)
-                    novaMapa[x, y] = 1;
-                else if (s < neededNeighbors)
-                    novaMapa[x, y] = 0;
-                else
-                    novaMapa[x, y] = mapa[x, y];
-            }
-        mapa = novaMapa;
-    }
-
-    int GetSurroundingWallCount(int gridX, int gridY)
-    {
-        int wallcount = 0;
-        for (int x = gridX - 1; x <= gridX + 1; x++)
-            for (int y = gridY - 1; y <= gridY + 1; y++)
-            {
-                if (x >= 0 && x < sirka && y >= 0 && y < vyska)
-                {
-                    if (gridX != x || gridY != y)
-                        wallcount += mapa[x, y];
-                }
-                else
-                    wallcount++;
-            }
-        return wallcount;
-    }
-
-    private void vytvorKrustu()
-    {
-        for (int x = 0; x < sirka; x++)
-            for (int y = vyska - KrustaVelikost; y < vyska; y++)
-                mapa[x, y] = 1;
-    }
-
-    private void vykresliMapu()
-    {
-        for (int x = 0; x < sirka; x++)
+        for (int i = 0; i < smoothIterations; i++)
         {
-            for (int y = 0; y < vyska; y++)
-            {
-                Vector3Int pozice = new Vector3Int(x - xRange, y + hloubkaPodzemi, 0);
+            SmoothMap();
+        }
 
-                if (mapa[x, y] == 1)
-                    mojemapa.SetTile(pozice, hlinaHlina);
+        CreateWorldCrust();
+        DrawMap();
+    }
+
+    private void InitializeMapRandomly()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                // Only fill tiles below the underground depth
+                if (y < undergroundDepth)
+                {
+                    mapGrid[x, y] = (Random.Range(0, 100) < fillPercent) ? 1 : 0;
+                }
                 else
-                    mojemapa.SetTile(pozice, null);
+                {
+                    mapGrid[x, y] = 0;
+                }
             }
         }
     }
 
-}
+    private void SmoothMap()
+    {
+        int[,] smoothedMap = new int[width, height];
 
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                int neighborWallCount = GetSurroundingWallCount(x, y);
+
+                if (neighborWallCount > neighborThreshold)
+                    smoothedMap[x, y] = 1;
+                else if (neighborWallCount < neighborThreshold)
+                    smoothedMap[x, y] = 0;
+                else
+                    smoothedMap[x, y] = mapGrid[x, y];
+            }
+        }
+
+        mapGrid = smoothedMap;
+    }
+
+    private int GetSurroundingWallCount(int gridX, int gridY)
+    {
+        int wallCount = 0;
+
+        for (int neighborX = gridX - 1; neighborX <= gridX + 1; neighborX++)
+        {
+            for (int neighborY = gridY - 1; neighborY <= gridY + 1; neighborY++)
+            {
+                // Check if the neighbor is within map boundaries
+                if (neighborX >= 0 && neighborX < width && neighborY >= 0 && neighborY < height)
+                {
+                    if (neighborX != gridX || neighborY != gridY)
+                    {
+                        wallCount += mapGrid[neighborX, neighborY];
+                    }
+                }
+                else
+                {
+                    // Treat out-of-bounds as walls to create solid borders
+                    wallCount++;
+                }
+            }
+        }
+
+        return wallCount;
+    }
+
+    private void CreateWorldCrust()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = height - crustSize; y < height; y++)
+            {
+                mapGrid[x, y] = 1;
+            }
+        }
+    }
+
+    private void DrawMap()
+    {
+        targetTilemap.ClearAllTiles();
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                // Reconstructing the offset position for Tilemap
+                Vector3Int tilePosition = new Vector3Int(x - xRange, y + undergroundDepth, 0);
+
+                if (mapGrid[x, y] == 1)
+                {
+                    targetTilemap.SetTile(tilePosition, dirtTile);
+                }
+                else
+                {
+                    targetTilemap.SetTile(tilePosition, null);
+                }
+            }
+        }
+    }
+}
