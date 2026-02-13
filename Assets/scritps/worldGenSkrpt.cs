@@ -46,6 +46,7 @@ public class WorldGenerator : MonoBehaviour
         }
 
         CreateWorldCrust();
+        GenerateHills();
         DrawMap();
     }
 
@@ -126,6 +127,11 @@ public class WorldGenerator : MonoBehaviour
                 mapGrid[x, y] = 1;
             }
         }
+    }
+
+    private void GenerateHills()
+    {
+        //function for Hill generations using perlín noise
     }
 
     private void DrawMap()
