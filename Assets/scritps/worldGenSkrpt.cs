@@ -17,6 +17,7 @@ public class WorldGenerator : MonoBehaviour
     [SerializeField] private int totalHeight = 500;
     [SerializeField] private int undergroundDepth = 300;
     [SerializeField] private int crustSize = 5;
+    [SerializeField] private int grassLevel = -5;
 
     [Header("Cellular Automata Settings")]
     [Range(0, 100)] [SerializeField] private int fillPercent = 45;
@@ -137,13 +138,14 @@ public class WorldGenerator : MonoBehaviour
     private void DrawMap()
     {
         targetTilemap.ClearAllTiles();
+        int StartY = grassLevel - height;
 
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 // Reconstructing the offset position for Tilemap
-                Vector3Int tilePosition = new Vector3Int(x - xRange, y + undergroundDepth, 0);
+                Vector3Int tilePosition = new Vector3Int(x - xRange, y + StartY, 0);
 
                 if (mapGrid[x, y] == 1)
                 {
