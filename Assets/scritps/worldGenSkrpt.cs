@@ -18,11 +18,17 @@ public class WorldGenerator : MonoBehaviour
     [SerializeField] private int undergroundDepth = 300;
     [SerializeField] private int crustSize = 5;
     [SerializeField] private int grassLevel = -5;
+    [SerializeField] private int groundLevel = 0;
 
     [Header("Cellular Automata Settings")]
     [Range(0, 100)] [SerializeField] private int fillPercent = 45;
     [SerializeField] private int smoothIterations = 3;
     [SerializeField] private int neighborThreshold = 4;
+
+    [Header("Hills Detail")]
+    [SerializeField] private float seed = 0.0f;
+    [SerializeField] private float PrimaryScale = 0.01f;
+    [SerializeField] private float SecondarScale = 0.08f;
 
     private int[,] mapGrid;
     private int width;
@@ -30,7 +36,14 @@ public class WorldGenerator : MonoBehaviour
 
     private void Start()
     {
+        SetASeed();
         GenerateWorld();
+
+    }
+
+    private void SetASeed()
+    {
+        seed = UnityEngine.Random.Range(0f, 100000f);
     }
 
     public void GenerateWorld()
@@ -48,6 +61,7 @@ public class WorldGenerator : MonoBehaviour
 
         CreateWorldCrust();
         GenerateHills();
+        AddGrass();
         DrawMap();
     }
 
@@ -123,7 +137,7 @@ public class WorldGenerator : MonoBehaviour
     {
         for (int x = 0; x < width; x++)
         {
-            for (int y = height - crustSize; y < height; y++)
+            for (int y = undergroundDepth - crustSize; y < undergroundDepth; y++)
             {
                 mapGrid[x, y] = 1;
             }
@@ -132,13 +146,50 @@ public class WorldGenerator : MonoBehaviour
 
     private void GenerateHills()
     {
+        int MountMaxHeight = 30;
         //function for Hill generations using perlín noise
+        for (int x = 0; x < width; x++)
+        {
+
+            float PrimaryNoise = Mathf.PerlinNoise((x + seed) * PrimaryScale, 0f) * 1.5f;
+            float SecondaryNoise = Mathf.PerlinNoise((x + seed) * SecondarScale, 0f) * 0.2f;
+            float finalNoise = PrimaryNoise + SecondaryNoise;
+
+            int currentHillTop = undergroundDepth + Mathf.RoundToInt(finalNoise * MountMaxHeight);
+
+            currentHillTop = Mathf.Clamp(currentHillTop, 0, height - 1);
+
+           for (int y = undergroundDepth; y < currentHillTop; y++)
+           {
+                mapGrid[x, y] = 1;
+           }
+        }
+    }
+
+    private void AddGrass()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = height - 1; y >= 0; y--)
+            {
+                // 1. Najdeme první blok hlíny (shora dolů)
+                if (mapGrid[x, y] == 1)
+                {
+                    // 2. Uděláme z něj trávu
+                    mapGrid[x, y] = 2;
+
+                    // 3. KLÍČOVÝ KROK: Zastavíme hledání v tomto sloupci!
+                    // Tím zajistíme, že se tráva neudělá nikde hlouběji.
+                    break;
+                }
+            }
+        }
     }
 
     private void DrawMap()
     {
         targetTilemap.ClearAllTiles();
-        int StartY = grassLevel - height;
+        int StartY = grassLevel - undergroundDepth;
 
         for (int x = 0; x < width; x++)
         {
@@ -151,6 +202,8 @@ public class WorldGenerator : MonoBehaviour
                 {
                     targetTilemap.SetTile(tilePosition, dirtTile);
                 }
+                else if (mapGrid[x, y] ==2)
+                    targetTilemap.SetTile(tilePosition, grassTile);
                 else
                 {
                     targetTilemap.SetTile(tilePosition, null);

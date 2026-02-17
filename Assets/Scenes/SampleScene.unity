@@ -707,7 +707,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.29, z: -10}
+  m_LocalPosition: {x: 0, y: 151, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1076,7 +1076,7 @@ Transform:
   m_GameObject: {fileID: 845148370}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.29, z: -10}
+  m_LocalPosition: {x: 0, y: 151, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1138,7 +1138,7 @@ Transform:
   m_GameObject: {fileID: 1364961436}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.29, z: 0}
+  m_LocalPosition: {x: 0, y: 151, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1393,16 +1393,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a414e532f1c03642cbc4bc0bc8af91a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  mojemapa: {fileID: 225772833}
-  hlinaTrava: {fileID: 11400000, guid: 1f28efd2cc0bbc6fa9022adbc2ff4fd3, type: 2}
-  hlinaHlina: {fileID: 11400000, guid: 32215ca698b0650da900666730fdcfb7, type: 2}
-  KrustaVelikost: 5
+  targetTilemap: {fileID: 225772833}
+  grassTile: {fileID: 11400000, guid: 1f28efd2cc0bbc6fa9022adbc2ff4fd3, type: 2}
+  dirtTile: {fileID: 11400000, guid: 32215ca698b0650da900666730fdcfb7, type: 2}
   xRange: 500
-  yRange: -200
+  totalHeight: 500
+  undergroundDepth: 300
+  crustSize: 5
   grassLevel: -5
-  fillPercent: 70
-  neededNeighbors: 5
-  vyhladKratMapu: 3
+  groundLevel: 0
+  fillPercent: 55
+  smoothIterations: 3
+  neighborThreshold: 4
+  seed: 6767
+  PrimaryScale: 0.01
+  SecondarScale: 0.04
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
